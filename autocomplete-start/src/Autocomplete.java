@@ -1,4 +1,4 @@
-wordwordweightsimport java.util.HashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Arrays;
@@ -347,7 +347,7 @@ private void add(String word, double weight) {
                 throw new NullPointerException("Error: Term value is null.");
         }
         if (weight < 0) {
-                throw new IllegalArgumentException("Error: Weight value is negative.")
+                throw new IllegalArgumentException("Error: Weight value is negative.");
         }
 
         Node node = myRoot;
@@ -367,7 +367,7 @@ private void add(String word, double weight) {
                 double max = node.mySubtreeMaxWeight;
                 while(node.parent != null) {
                         if(node.parent.mySubtreeMaxWeight == max) {
-                                node.mySubtreeMaxWeight = weight
+                                node.mySubtreeMaxWeight = weight;
                         }
                         node.parent = node.parent.parent;
                 }
@@ -399,7 +399,7 @@ private void add(String word, double weight) {
  */
 public Iterable<String> topMatches(String prefix, int k) {
         if (prefix == null) {
-                throw new NullPointerException("Error: Prefix is Null.")
+                throw new NullPointerException("Error: Prefix is Null.");
         }
         Node node = myRoot;
         PriorityQueue<Node> pri = new PriorityQueue<Node>(new Node.ReverseSubtreeMaxWeightComparator());
@@ -407,7 +407,7 @@ public Iterable<String> topMatches(String prefix, int k) {
 
         for (int i = 0; i < prefix.length(); i++) {
                 char letter = prefix.charAt(i);
-                node = noide.getChild(letter);
+                node = node.getChild(letter);
                 if(node == null) {
                         return new ArrayList<String>();
                 }
@@ -448,8 +448,24 @@ public Iterable<String> topMatches(String prefix, int k) {
  *             NullPointerException if the prefix is null
  */
 public String topMatch(String prefix) {
-        // TODO: Implement topMatch
-        return null;
+        if (prefix == null) {
+                throw new NullPointerException("Error: Prefix is Null.");
+        }
+
+        Node node = myRoot;
+        PriorityQueue<Node> pri = new PriorityQueue<Node>(new Node.ReverseSubtreeMaxWeightComparator());
+
+        for (int i = 0; i < prefix.length(); i++) {
+                char letter = prefix.charAt(i);
+                if(!node.children.containsKey(letter)) {
+                        return "";
+                }
+                node = node.getChild(letter);
+        }
+        while(node.mySubtreeMaxWeight != node.getWeight()) {
+                pri.addAll(node.children.values());
+        }
+        return node.getWord();
 }
 
 /**
