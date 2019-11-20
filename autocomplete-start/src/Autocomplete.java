@@ -1,4 +1,4 @@
-weightsimport java.util.HashSet;
+wordwordweightsimport java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Arrays;
@@ -341,25 +341,25 @@ public TrieAutocomplete(String[] terms, double[] weights) {
  * @throws an
  *             IllegalArgumentException if weight is negative.
  */
-private void add(String term, double weights) {
+private void add(String word, double weight) {
 
-        if (term == null) {
+        if (word == null) {
                 throw new NullPointerException("Error: Term value is null.");
         }
-        if (weights < 0) {
+        if (weight < 0) {
                 throw new IllegalArgumentException("Error: Weight value is negative.")
         }
 
         Node node = myRoot;
-        for (int i = 0; i < term.length(); i++) {
-                char letter = term.charAt(i);
-                if(node.mySubtreeMaxWeight < weights) {
-                        node.mySubtreeMaxWeight = weights;
+        for (int i = 0; i < word.length(); i++) {
+                char letter = word.charAt(i);
+                if(node.mySubtreeMaxWeight < weight) {
+                        node.mySubtreeMaxWeight = weight;
                 }
-                Node childNode = node.getChild(char);
+                Node childNode = node.getChild(letter);
                 if (childNode = null) {
-                        childNode = new Node(char, node, weights);
-                        node.children.put(char, childNode);
+                        childNode = new Node(letter, node, weight);
+                        node.children.put(letter, childNode);
                 }
                 node = childNode;
         }
@@ -367,14 +367,14 @@ private void add(String term, double weights) {
                 double max = node.mySubtreeMaxWeight;
                 while(node.parent != null) {
                         if(node.parent.mySubtreeMaxWeight == max) {
-                                node.mySubtreeMaxWeight = weights
+                                node.mySubtreeMaxWeight = weight
                         }
                         node.parent = node.parent.parent;
                 }
         }
         node.isWord = true;
-        node.setWord(term);
-        node.setWeight(weights);
+        node.setWord(word);
+        node.setWeight(weight);
 }
 
 /**
@@ -398,8 +398,42 @@ private void add(String term, double weights) {
  *             NullPointerException if prefix is null
  */
 public Iterable<String> topMatches(String prefix, int k) {
-        // TODO: Implement topKMatches
-        return null;
+        if (prefix == null) {
+                throw new NullPointerException("Error: Prefix is Null.")
+        }
+        Node node = myRoot;
+        PriorityQueue<Node> pri = new PriorityQueue<Node>(new Node.ReverseSubtreeMaxWeightComparator());
+        ArrayList<Node> top = new ArrayList<Node>();
+
+        for (int i = 0; i < prefix.length(); i++) {
+                char letter = prefix.charAt(i);
+                node = noide.getChild(letter);
+                if(node == null) {
+                        return new ArrayList<String>();
+                }
+        }
+        pri.add(node);
+
+        while(pri.size() != 0) {
+                if(topMatch.size() >= k) {
+                        Collections.sort(topMatch, Collections.reverseOrder());
+                        if(pri.peek().mySubtreeMaxWeight < topMatch.get(k - 1).getWeight()) {
+                                break;
+                        }
+                }
+                node = pri.poll();
+                if(node.isWord) {
+                        topMatch.add(node);
+                }
+                for(Node childNode : node.children.values()) {
+                        pri.add(childNode);
+                }
+        }
+        ArrayList<String> wordString = new ArrayList<String>();
+        for(int i = 0; i < k; i++) {
+                wordString.add(topMatch.get(i).myWord);
+        }
+        return wordString;
 }
 
 /**
